@@ -60,7 +60,7 @@ def fetch_data(file_url: str = sys.argv[1], dest: str = "./data"):
         print(f"file url: {file_url}")
         # check is url is really a url, maybe with pydantic
         print(f"==>Downloading {ext} file<==")
-        filename = wget.download(file_url)
+        filename = wget.download(file_url, out=dest)
         print(f"{filename} downloaded succesfully!")
         return filename
 
@@ -80,6 +80,7 @@ def check_unnamed(col_name: str) -> bool:
         return False
 
 filename = fetch_data()
+print(f"Ouput Filename: {filename}")
 running_dir = os.path.dirname(__file__)
 table_name = sys.argv[2]
 
@@ -92,18 +93,24 @@ df = pd.read_csv(
 df["tpep_pickup_datetime"] = pd.to_datetime(df["tpep_pickup_datetime"])
 df["tpep_dropoff_datetime"] = pd.to_datetime(df["tpep_dropoff_datetime"])
 df.columns = [column.lower() for column in df.columns]
-schema = pd.io.sql.get_schema(df, name=table_name, con=engine)
-print(schema)
+schema = pd.io.sql.get_schema(df, name=table_name, con=engine, keys=["venderid"])
 
-# df = pd.read_csv(
-#     os.path.join(running_dir, filename),
-#     usecols=check_unnamed,
-#     iterator=True,
-#     chunksize=CHUNK_SIZE
-# )
-
-# # create table with sql alchemy
-
-# df.to_sql(
-#     name=table_name, con=engine, if_exists="replace", index=False
-# )
+df = pd.read_csv(
+    os.path.join(running_dir, filename),
+    usecols=check_unnamed,
+    iterator=True,
+    chunksize=CHUNK_SIZE
+)
+engine.execute(schema)
+for batch, df_chunck in enumerate(df):
+    df_chunck["tpep_pickup_datetime"] = pd.to_datetime(df_chunck["tpep_pickup_datetime"])
+    df_chunck["tpep_dropoff_datetime"] = pd.to_datetime(df_chunck["tpep_dropoff_datetime"])
+    df_chunck.columns = [column.lower() for column in df_chunck.columns]
+    if (batch == 0):
+        if_exists = "replace"
+    else:
+        if_exists = "append"
+    df_chunck.to_sql(
+        name=table_name, con=engine, if_exists=if_exists, index=False
+        )
+    print(f"Batch {batch} ingested to database!")

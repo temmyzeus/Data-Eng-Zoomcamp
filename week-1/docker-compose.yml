@@ -12,6 +12,9 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DATABASE}
+    networks:
+      - pipeline-postgres
+      - pgadmin-postgres
     # restart: always
 
   pipeline:
@@ -35,12 +38,19 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     container_name: nyc-pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${DB_PASSWORD}
     env_file:
       - .env
+    ports:
+      - 5551:80
     depends_on:
       - postgres
-    # networks:
-      # - pgadmin-postgres
+    networks:
+      - pgadmin-postgres
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
 volumes:
   postgres-db:
@@ -50,5 +60,5 @@ networks:
   pipeline-postgres:
     driver: bridge
 
-  # pgadmin-postgres:
-  #   driver: bridge
+  pgadmin-postgres:
+    driver: bridge

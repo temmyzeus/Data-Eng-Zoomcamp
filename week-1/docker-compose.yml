@@ -27,7 +27,7 @@ services:
     env_file:
       - .env
     environment:
-      - DB_HOST:postgres
+      - DB_HOST=postgres
     depends_on:
       - postgres
     networks:

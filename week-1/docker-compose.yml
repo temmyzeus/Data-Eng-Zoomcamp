@@ -1,0 +1,54 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: nyc-postgres-db
+    ports:
+      - '5550:5432'
+    volumes:
+      - './postgres-db:/var/lib/postgresql/data'
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DATABASE}
+    # restart: always
+
+  pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nyc-python-pipeline
+    volumes:
+      - .:/data-ingestion
+    env_file:
+      - .env
+    environment:
+      - DB_HOST:postgres
+    depends_on:
+      - postgres
+    networks:
+      - pipeline-postgres
+    entrypoint: ['python', 'pipeline.py']
+    command: ["https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"]
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: nyc-pgadmin
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    # networks:
+      # - pgadmin-postgres
+
+volumes:
+  postgres-db:
+    driver: local
+
+networks:
+  pipeline-postgres:
+    driver: bridge
+
+  # pgadmin-postgres:
+  #   driver: bridge

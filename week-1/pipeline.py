@@ -93,7 +93,7 @@ df = pd.read_csv(
 df["tpep_pickup_datetime"] = pd.to_datetime(df["tpep_pickup_datetime"])
 df["tpep_dropoff_datetime"] = pd.to_datetime(df["tpep_dropoff_datetime"])
 df.columns = [column.lower() for column in df.columns]
-schema = pd.io.sql.get_schema(df, name=table_name, con=engine, keys=["venderid"])
+schema = pd.io.sql.get_schema(df, name=table_name, con=engine, keys=["vendorid"])
 
 df = pd.read_csv(
     os.path.join(running_dir, filename),

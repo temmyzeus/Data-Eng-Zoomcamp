@@ -33,7 +33,7 @@ services:
     networks:
       - pipeline-postgres
     entrypoint: ['python', 'pipeline.py']
-    command: ["https://raw.githubusercontent.com/temmyzeus/Data-Eng-Zoomcamp/master/data/yellow_tripdata_2021-01.csv", "yellow_taxis_jan_2021"]
+    command: ["https://media.githubusercontent.com/media/temmyzeus/Data-Eng-Zoomcamp/master/data/yellow_tripdata_2021-01.csv", "yellow_taxis_jan_2021"]
 
   pgadmin:
     image: dpage/pgadmin4

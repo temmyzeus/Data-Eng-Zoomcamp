@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import sys
 import time
@@ -66,11 +67,11 @@ def fetch_data(file_url: str = sys.argv[1], dest: str = "./data"):
 
 def check_unnamed(col_name: str) -> bool:
     """Check if a column is named `Unnamed`
-    
+
     @argument
     col_name: str
         column name to check
-        
+
     @returns
     is_unnamed: bool
     """

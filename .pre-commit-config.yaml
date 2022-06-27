@@ -1,0 +1,16 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks.git
+    rev: v4.3.0
+    hooks: 
+    -   id: trailing-whitespace
+        alias: trim-wsp
+        name: Trim Trailing Whitespace
+        description: This hook trims trailing whitespace
+        types: [python]
+        verbose: true
+    -   id: requirements-txt-fixer
+        alias: req-fix
+        name: Requirements.txt Fixer
+    -   id: fix-encoding-pragma
